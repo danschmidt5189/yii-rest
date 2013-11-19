@@ -13,7 +13,7 @@ Yii::import('ext.yii-rest.*');
  * @package     yii-rest
  * @subpackage  components
  */
-class RESTSource
+class RESTFacadeSource
 {
     const ANY    = 'ANY';
     const GET    = 'GET';

@@ -1,6 +1,6 @@
 <?php
 /**
- * RESTEndpoint class file.
+ * RESTFacadeParam class file.
  *
  * @author Dan Schmidt <danschmidt5189@gmail.com>
  */
@@ -13,7 +13,7 @@ Yii::import('ext.yii-rest.*');
  * @package     yii-rest
  * @subpackage  components
  */
-class RESTEndpointParam extends CComponent
+class RESTFacadeParam extends CComponent
 {
     /**
      * @var string  internal name for the parameter
@@ -21,7 +21,7 @@ class RESTEndpointParam extends CComponent
     private $_name;
 
     /**
-     * @var string  HTTP request source. E.g. 'GET', 'POST', etc. Defaults to RESTSource::ANY, meaning any
+     * @var string  HTTP request source. E.g. 'GET', 'POST', etc. Defaults to RESTFacadeSource::ANY, meaning any
      *              source can provide this data.
      */
     private $_source;

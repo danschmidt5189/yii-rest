@@ -1,6 +1,6 @@
 <?php
 /**
- * RESTEndpoint class file.
+ * RESTFacade class file.
  *
  * @author Dan Schmidt <danschmidt5189@gmail.com>
  */
@@ -16,12 +16,12 @@ Yii::import('ext.yii-rest.*');
  * @package     yii-rest
  * @subpackage  components
  */
-class RESTEndpoint extends CComponent
+class RESTFacade extends CComponent
 {
     /**
-     * @var array  list of RESTEndpointParam configurations. Each configuration is an array with keys:
+     * @var array  list of RESTFacadeParam configurations. Each configuration is an array with keys:
      * 0 = private attribute name, required
-     * 1 = attribute source (@see RESTSource for values), optional
+     * 1 = attribute source (@see RESTFacadeSource for values), optional
      * 2 = public attribute name, optional
      */
     public $interface = array();
@@ -41,7 +41,7 @@ class RESTEndpoint extends CComponent
      *
      * If they have not been loaded, they are instantiated using [loadParams()].
      *
-     * @return array  list of RESTEndpointParam objects
+     * @return array  list of RESTFacadeParam objects
      */
     public function getParams($reset=false)
     {
@@ -54,7 +54,7 @@ class RESTEndpoint extends CComponent
     /**
      * Returns endpoint parameters indexed by private name
      *
-     * @return array  list of RESTEndpointParam objects built from [interface]
+     * @return array  list of RESTFacadeParam objects built from [interface]
      */
     public function loadParams()
     {
@@ -65,7 +65,7 @@ class RESTEndpoint extends CComponent
             $key = key($config);
             $name = current($config);
             $publicName = is_numeric($key) ? $name : $key;
-            $params[$name] = new RESTEndpointParam($source, $name, $publicName);
+            $params[$name] = new RESTFacadeParam($source, $name, $publicName);
         }
         return $params;
     }
@@ -97,16 +97,16 @@ class RESTEndpoint extends CComponent
         $rawData = array();
         foreach ($this->params as $param) {
             switch (strtoupper($param->source)) {
-                case RESTSource::GET:
+                case RESTFacadeSource::GET:
                     $rawData[$param->name] = $request->getQuery($param->publicName);
                     break;
-                case RESTSource::POST:
+                case RESTFacadeSource::POST:
                     $rawData[$param->name] = $request->getPost($param->publicName);
                     break;
-                case RESTSource::ANY:
+                case RESTFacadeSource::ANY:
                     $rawData[$param->name] = $request->getParam($param->publicName);
                     break;
-                case RESTSource::DELETE:
+                case RESTFacadeSource::DELETE:
                     $rawData[$param->name] = $request->getDelete($param->publicName);
                     break;
                 default:
