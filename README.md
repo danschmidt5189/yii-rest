@@ -2,7 +2,7 @@
 
 The Yii REST extension adds classes and filters that help you write RESTful controllers. Key features:
 
-1. A facade layer for translating client requests to a format your controller understands
+1. A Adaptor layer for translating client requests to a format your controller understands
 2. A parameter model for validating and configuring your action parameters in an OOP way
 3. A standard set of Actions for all your CRUD needs
 4. A works-out-of-the-box RESTController with verb and parameter filtering
@@ -13,15 +13,15 @@ The Yii REST extension adds classes and filters that help you write RESTful cont
 
 The RESTController introduces two new properties:
 
-- `$_actionParams`: A form model representing the parameters passed to your controller actions.
-- `$_facade`: A class that maps client request data to `$_actionParams` attributes.
+- `$_restParams`: A form model representing the parameters passed to your controller actions.
+- `$_restAdaptor`: A class that maps client request data to `$_restParams` attributes.
 
 There are several benefits to including these new components:
 
-- We can modify either the client or internal interface and only have to change the facade layer.
-- We can seemlessly switch in/out parameter models having the same property interface. (E.g. use different
-  models based on the type of the user.)
-- We can easily return informative API messages by validating the parameter model.
+- To change how client requests are mapped to the back-end, we need only change the adaptor layer
+- We can seemlessly swap between parameter models having the same property interface. (E.g. one model
+  for Admins and another for standard users.)
+- We can easily return informative API messages by validating the parameter model
 
 ### Example: CustomersController.php
 
@@ -30,11 +30,11 @@ There are several benefits to including these new components:
 /**
  * RESTful customers controller
  *
- * The default implementation will load a facade component called `CustomersFacade` and a parameter
+ * The default implementation will load a Adaptor component called `CustomersAdaptor` and a params
  * model called `CustomersParams`. The rest is done for you. The parent implementation adds standard
- * REST verb filters and validates the action parametermodel.
+ * REST verb filters and validates the params model.
  *
- * @see CustomersFacade
+ * @see CustomersAdaptor
  * @see CustomersParams
  */
 class CustomersController extends RESTController
@@ -45,6 +45,7 @@ class CustomersController extends RESTController
      * Filtering of invalid methods is handled by [RESTController::filters()].
      *
      * @return array  RESTAction configurations indexed by action id
+     * @see yii-rest.actions for example action classes
      */
     public function actions()
     {
@@ -69,32 +70,34 @@ class CustomersController extends RESTController
 ?>
 ```
 
-## RESTFacade
+## RESTAdaptor
 
 #### A fancy version of `getActionParams()`
 
-The facade maps the client request to the attributes of the parameter model. It indicates three things:
+The adaptor maps the client request to the attributes of the params model.
 
-- What public parameters the controller looks for.
-- Where the controller looks for those parameters. (E.g. GET, POST, ...)
-- What internal parameter the public parameter corresponds to
+Its configuration indicates three things:
 
-### Example: CustomersFacade.php
+- What public params the controller looks for
+- What internal param the public param maps to
+- Where the controller looks for the public param. (E.g. GET, POST, ...)
+
+### Example: CustomersAdaptor.php
 
 ```php
 <?php
 /**
- * Represents the public/private adaptor facade for the CustomersController
+ * The client->backend adaptor for the CustomersController
  */
-class CustomersFacade extends RESTFacade
+class CustomersAdaptor extends RESTAdaptor
 {
     public $interface = array(
         // Here the public and private keys are identical
-        array(RESTFacadeSource::GET, 'id'),
-        array(RESTFacadeSource::GET, 'type'),
+        array(RESTSource::GET, 'id'),
+        array(RESTSource::GET, 'type'),
         // Here the client provides the 'Customer' parameter, which is mapped
         // to the 'data' property of the params model
-        array(RESTFacadeSource::ANY, 'Customer' =>'data'),
+        array(RESTSource::ANY, 'Customer' =>'data'),
     );
 }
 ?>
@@ -104,12 +107,12 @@ class CustomersFacade extends RESTFacade
 
 #### A fancy version of `loadModel()`
 
-RESTParams validates raw request parameters extracted by the facade layer and makes them available to your actions.
+RESTParams validates and processes raw request parameters extracted by the adaptor and makes them available to your actions.
 
 `RESTParams::$scenario` should correspond to an action ID.
 
 If implementing RESTParams, you must implement the `loadModel()` method. However, you do not have to implement RESTParams;
-any CFormModel will also work, with its public properties used to bind action parameter values.
+any CFormModel will also work, with its public properties used to bind action parameters.
 
 ### Example: CustomersParams.php
 
