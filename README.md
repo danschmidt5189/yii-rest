@@ -46,12 +46,11 @@ The RESTController introduces two new properties:
 
 There are several benefits to including these new components:
 
-- To change how client requests are mapped to the back-end, we need only change the adaptor layer
-- We can seemlessly swap between parameter models having the same property interface. (E.g. one model
-  for admins and another for standard users.)
-- We can easily return informative API error messages by validating the parameter model
-- We keep our controllers (and actions) super thin by delegating complex loading/initialization logic
-  to dedicated classes.
+- `RESTParams` makes it trivial to render API error messages back to users
+- `RESTAdaptor` describes the public interface for the controller
+- To change the public interface, change the adaptor model
+- To change the action parameters, change the params model. (E.g. swap out "Admin" and "User" models depending
+  on the current user.)
 
 ### Example: CustomersController.php
 
@@ -83,21 +82,6 @@ class CustomersController extends RESTController
 }
 ?>
 ```
-
-## RESTActions
-
-This extension ships with four basic CRUD actions:
-
-- RESTActionLoad      Loads data into a model and renders a view. Works for 'list'
-                      or plain 'view' actions.
-- RESTActionValidate  Loads data into a model and validates it. Works well for 'new'
-                      and 'edit' actions which present forms.
-- RESTActionSave      Loads data into a model and saves it. Works well for 'create'
-                      and 'update' actions that actually modify the database.
-- RESTActionDelete    Deletes a model.
-
-Each action can be configured with its own `$view` and `$params`, which determines
-the view into with the action's result and parameters are rendered.
 
 ## RESTAdaptor
 
@@ -255,6 +239,21 @@ class CustomersParams extends RESTParams
 }
 ?>
 ```
+
+## RESTActions
+
+This extension ships with four basic CRUD actions:
+
+- RESTActionLoad      Loads data into a model and renders a view. Works for 'list'
+                      or plain 'view' actions.
+- RESTActionValidate  Loads data into a model and validates it. Works well for 'new'
+                      and 'edit' actions which present forms.
+- RESTActionSave      Loads data into a model and saves it. Works well for 'create'
+                      and 'update' actions that actually modify the database.
+- RESTActionDelete    Deletes a model.
+
+Each action can be configured with its own `$view` and `$params`, which determines
+the view into with the action's result and parameters are rendered.
 
 ## Filters
 
