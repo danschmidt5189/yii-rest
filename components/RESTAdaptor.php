@@ -168,7 +168,7 @@ class RESTAdaptor extends CComponent
                     $rawData[$param->name] = $request->getDelete($param->publicName);
                     break;
                 default:
-                    throw new CException("Invalid source {$source} for endpoint {$param->name} in ".__CLASS__);
+                    throw new CException("Invalid source `$source` for internal param {$param->name}, client param {$param->publicName} in ".__CLASS__);
             }
         }
         return $rawData;
