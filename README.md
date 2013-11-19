@@ -9,21 +9,30 @@ The Yii REST extension adds classes and filters that help you write RESTful cont
 
 ## REST Controller
 
-A RESTController manages a class of resources in an OOP fashion. It introduces two new properties:
+#### A little bit Yii, a lot of bit Symfony2
 
-- `$_facade`: A mapper that translates client requests into a standard internal format. This is analogous
-  to `CController::getActionParams()`.
-- `$_actionParams`: A form model representing the action parameters. This can be validated by your filters,
-  and it is also used to directly bind your controller action parameters.
+The RESTController introduces two new properties:
+
+- `$_actionParams`: A form model representing the parameters passed to your controller actions.
+- `$_facade`: A class that maps client requests to a format understood by the `$_actionParams` model.
+
+There are several benefits to including these new components:
+
+- We can modify the client interface by changingt the facade layer without changing any other code.
+- We can seemlessly switch in/out parameter models having the same property interface.
+- We can validate the parameter model to easily return informative API error messages to the client.
 
 ```php
 <?php
 /**
- * Example: A RESTful customers controller.
+ * RESTful customers controller
  *
  * The default implementation will load a facade component called `CustomersFacade` and a parameter
  * model called `CustomersParams`. The rest is done for you. The parent implementation adds standard
  * REST verb filters and validates the action parametermodel.
+ *
+ * @see CustomersFacade
+ * @see CustomersParams
  */
 class CustomersController extends RESTController
 {
@@ -57,43 +66,47 @@ class CustomersController extends RESTController
 ?>
 ```
 
-## REST Facade: Fancy `getActionParams()`
+## REST Facade
 
-The facade extracts raw action parameters from the client request. It is analogous to `CController::getActionParams()`.
+#### A fancy version of `getActionParams()`
 
-The facade layer manages two things:
+The facade maps the client request to the attributes of the parameter model. It indicates three things:
 
-- Where to look for data in the client request. (E.g. GET, POST, ...)
-- How to map a client key to an internal parameter attribute (E.g. $_GET["Customer"] =>$params->filters)
+- What public parameters the controller looks for.
+- Where the controller looks for those parameters. (E.g. GET, POST, ...)
+- What internal parameter the public parameter corresponds to
 
 ```php
 <?php
+/**
+ * Represents the public : private adaptor for the CustomersController
+ */
 class CustomersEndpoint extends RESTEndpoint
 {
     public $interface = array(
+        // Here the public and private keys are identical
         array('QUERY', 'id'),
         array('QUERY', 'type'),
-        // The 'Customer' request parameter is mapped to the 'data' attribute of
-        // the CustomersParams model.
+        // Here the client provides the 'Customer' parameter, which is mapped
+        // to the 'data' property of the params model
         array('ANY', 'Customer' =>'data'),
     );
 }
 ?>
 ```
 
-## RESTParams: Fancy `loadModel()`
+## RESTParams
 
-RESTParams is a model representing the parameters passed as arguments to your controller actions. A standard way to use
-this would be to expose a `$model` property which is constructed with some initial, unchangeable settings (e.g. scopes)
-along with modifications due to the current request. (E.g., "If 'id' is set, load that specific customer after applying all
-scopes and filters.")
+#### A fancy version of `loadModel()`
 
-The scenario of a RESTParams model should correspond to an Action ID.
+RESTParams validates raw request parameters parsed by the facade layer and makes them available to your actions. Scenarios
+should correspond to an Action ID. When extending `RESTParams`, you are required to implement the `loadModel()` method,
+however it is not required that you do so. (Any CFormModel will also work.)
 
 ```php
 <?php
 /**
- * Represents action parameters for the CustomersController.
+ * Represents action parameters for the CustomersController
  */
 class CustomersParams extends RESTParams
 {
@@ -167,7 +180,6 @@ class CustomersParams extends RESTParams
                 'range' =>array(Customer::ACTIVE, Customer::DISABLED),
                 'on' =>array('list'),
             ),
-            // Data is an array of attributes
             array(
                 'data',
                 'type',
