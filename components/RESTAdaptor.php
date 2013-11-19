@@ -13,23 +13,33 @@ Yii::import('ext.yii-rest.*');
  * Use this class when your public API users send data using key names that do not match the attributes
  * of your controller's action parameter model.
  *
+ * @property array $interface  parameters configuration
+ *
+ * @property array $_restAdaptorParams  array of RESTAdaptorParam objects loaded using [interface]
+ * @property CMap  $rawActionParams     the raw action parameters pulled from the current request
+ *
+ * @method array getClientInterface()    returns a description of the client interface for this adaptor
+ * @method array getInternalInterface()  returns a description of the internal interface for this adaptor
+ * @method array getRawActionParams()    returns the raw action parameters parsed from the current request
+ *
  * @package     yii-rest
  * @subpackage  components
  */
 class RESTAdaptor extends CComponent
 {
     /**
-     * @var array  list of RESTAdaptorParam configurations. Each configuration is an array with keys:
-     * 0 = private attribute name, required
-     * 1 = attribute source (@see RESTAdaptorSource for values), optional
-     * 2 = public attribute name, optional
+     * @var array  list of RESTAdaptorParam configurations. The first element in the configuration
+     *             is the `RESTSource` constant indicating the source of the value. The second is
+     *             either a string or a key =>value pair. If a string, the string is both the internal
+     *             and public name for the parameter. If a key =>value pair, the key is the public name
+     *             and the value is the internal name of the parameter.
      */
     public $interface = array();
 
     /**
      * @var array  parameters for this endpoint
      */
-    private $_endpointParams;
+    private $_restAdaptorParams;
 
     /**
      * @var CMap  the raw data passed in the current request
@@ -65,7 +75,7 @@ class RESTAdaptor extends CComponent
      *
      * @return array  HTTP method names indexed by parameter name
      */
-    public function getPublicInterface()
+    public function getClientInterface()
     {
         $interface = array();
         foreach ($this->params as $param) {
@@ -93,10 +103,10 @@ class RESTAdaptor extends CComponent
      */
     public function getParams($reset=false)
     {
-        if (null === $this->_endpointParams || $reset) {
-            $this->_endpointParams = $this->loadParams();
+        if (null === $this->_restAdaptorParams || $reset) {
+            $this->_restAdaptorParams = $this->loadParams();
         }
-        return $this->_endpointParams;
+        return $this->_restAdaptorParams;
     }
 
     /**
