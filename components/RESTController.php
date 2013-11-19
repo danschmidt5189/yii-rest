@@ -5,7 +5,9 @@
  * @author Dan Schmidt <danschmidt5189@gmail.com>
  */
 
-Yii::import('ext.yii-rest.*');
+Yii::import('yii-rest.components.*');
+Yii::import('yii-rest.filters.*');
+Yii::import('yii-rest.actions.*');
 
 /**
  * Base RESTController class
@@ -140,5 +142,48 @@ class RESTController extends Controller
     public function getRawActionParams()
     {
         return $this->restAdaptor->getRawActionParams();
+    }
+
+    /**
+     * Returns action configurations
+     *
+     * The default set of actions allows allows for the standard CRUD actions following
+     * the Ruby on Rails convention that POST and GET versions of the same action be
+     * handled differently. (E.g. "new" renders the create form, while "create" actually
+     * creates the record.)
+     *
+     * @return array  action configurations indexed by action id
+     */
+    public function actions()
+    {
+        return array(
+            'view'    =>array('class' =>'yii-rest.actions.RESTActionLoad'),
+            'list'    =>array('class' =>'yii-rest.actions.RESTActionLoad'),
+            'new'     =>array('class' =>'yii-rest.actions.RESTActionValidate'),
+            'edit'    =>array('class' =>'yii-rest.actions.RESTActionValidate'),
+            'update'  =>array('class' =>'yii-rest.actions.RESTActionSave'),
+            'create'  =>array('class' =>'yii-rest.actions.RESTActionSave'),
+        );
+    }
+
+    /**
+     * Returns filter configurations
+     *
+     * There are three default filters:
+     * - Verb filters:  These restrict access to backend methods ('update', 'delete', 'create') based on HTTP method (400)
+     * - Param filter:  This validates the action parameters model and throws an exception if invalid (400)
+     * - Access check:  The standard access control filter (403)
+     *
+     * @return array  filter configurations
+     */
+    public function filters()
+    {
+        return array(
+            array('RESTVerbsFilter', 'actions' =>array('create'), 'verbs' =>array('POST')),
+            array('RESTVerbsFilter', 'actions' =>array('update'), 'verbs' =>array('PUT', 'PATCH')),
+            array('RESTVerbsFilter', 'actions' =>array('delete'), 'verbs' =>array('DELETE')),
+            array('RESTParamsFilter'),
+            'accessControl',
+        );
     }
 }
