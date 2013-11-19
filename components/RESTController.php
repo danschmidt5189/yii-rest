@@ -8,6 +8,8 @@
 Yii::import('yii-rest.components.*');
 Yii::import('yii-rest.filters.*');
 Yii::import('yii-rest.actions.*');
+// Import your own base controller
+Yii::import('application.components.Controller');
 
 /**
  * Base RESTController class
