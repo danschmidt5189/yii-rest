@@ -162,9 +162,18 @@ class CustomersParams extends RESTParams
     // public $model;
 
     /**
+     * Loads the Customer model
+     *
+     * The model's scope is always restricted to return only active customers owned by the current user.
+     * If the `type` attribute is set, only customers of that type will be returned. If the `id`
+     * attribute is set, this will attempt to load that Customer. (After applying all filters.)
+     *
+     * You should not call this method directly. It is set a a filter on the [model] property in
+     * [RESTParams::rules()].
+     *
      * @return Customer  the customer model for this request
      */
-    public function loadModel()
+    protected function loadModel()
     {
         $user = Yii::app()->getUser();
 
@@ -197,28 +206,29 @@ class CustomersParams extends RESTParams
      */
     public function rules()
     {
-        return CMap::mergeArray(array(
-            // ID is only valid on actions dealing with a specific customer
+        return CMap::mergeArray(
             array(
-                'id',
-                'required',
-                'on' =>array('view', 'update', 'delete'),
+                // ID is only valid on actions dealing with a specific customer
+                array(
+                    'id',
+                    'required',
+                    'on' =>array('view', 'update', 'delete'),
+                ),
+                array(
+                    'type',
+                    'in',
+                    'range' =>array(Customer::ACTIVE, Customer::DISABLED),
+                    'on' =>array('list'),
+                ),
+                array(
+                    'data',
+                    'type',
+                    'type' =>'array',
+                ),
             ),
-            array(
-                'type',
-                'in',
-                'range' =>array(Customer::ACTIVE, Customer::DISABLED),
-                'on' =>array('list'),
-            ),
-            array(
-                'data',
-                'type',
-                'type' =>'array',
-            ),
-        ),
-        // Merge parent rules so that the model is loaded, required,
-        // and declared unsafe.
-        parent::rules());
+            // Merge parent rules so that [model] is loaded, required, and declared unsafe.
+            parent::rules()
+        );
     }
 }
 ?>
@@ -228,8 +238,8 @@ class CustomersParams extends RESTParams
 
 Two filters are bundled with this extension:
 
-- RESTVerbsFilter, for filtering out invalid requests based on the HTTP method
-- RESTParamsFilter, which filters out invalid requests using a form to validate action parameters
+- RESTVerbsFilter, which filters requests which use the wrong HTTP method
+- RESTParamsFilter, which filters requests where `$_restParams` is invalid
 
 (There is an empty base `yii-rest.components.RESTFilter` that you can override as you see fit.)
 
