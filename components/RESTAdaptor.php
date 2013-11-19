@@ -47,28 +47,6 @@ class RESTAdaptor extends CComponent
     private $_rawActionParams;
 
     /**
-     * Constructs the adaptor
-     *
-     * The default implementation is a "pass through" adaptor, in which any GET or POST value is
-     * mapped to itself.
-     *
-     * @param array $interface  value to set to the [interface] property
-     */
-    public function __construct(array $interface=null)
-    {
-        if (null === $interface) {
-            $interface = array();
-            foreach ($_GET as $name =>$value) {
-                $interface[] = array(RESTSource::GET, $name);
-            }
-            foreach ($_POST as $name =>$value) {
-                $interface[] = array(RESTSource::POST, $name);
-            }
-        }
-        $this->interface = $interface;
-    }
-
-    /**
      * Returns the parameter sources (GET, POST, ...) indexed by public parameter name
      *
      * This indicates to clients what they can send to the controller that will be understood.

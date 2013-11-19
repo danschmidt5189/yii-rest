@@ -67,21 +67,17 @@ class RESTController extends Controller
     }
 
     /**
-     * Returns the facade component for this controller
+     * Returns the adaptor for this controller
      *
-     * The default implementation returns a facade with the class name "{ControllerID}Facade"
-     * and configures it to pass all GET and POST data without modification.
+     * The default implementation returns a adaptor with the class name "{ControllerID}Adaptor".
      *
      * @return RESTAdaptor  the facade
      */
     public function loadRESTAdaptor()
     {
-        $facadeClass = $this->restAdaptorClassName ?: $this->id.'Adaptor';
-        $facade = new $facadeClass(array_map(
-            function ($name) { return array(RESTSource::GET, $name); },
-            array_keys($_GET + $_POST)
-        ));
-        return $facade;
+        $adaptorClassName = $this->restAdaptorClassName ?: $this->id.'Adaptor';
+        $adaptor = new $adaptorClassName();
+        return $adaptor;
     }
 
     /**
@@ -108,11 +104,11 @@ class RESTController extends Controller
     }
 
     /**
-     * Loads the action parameters
+     * Loads the rest params model
      *
-     * This is used by [getModel()] to load the [_model] property if it is null. The default implementation
-     * creates a form with the class name '{ControllerId}Params', sets its scenario to the id of the current action,
-     * and sets its attributes to $_GET and $_POST.
+     * The model is instantiated using the class [restParamsClassName], if it is set, or the name
+     * "{ControllerId}Params". Its scenario is set to the id of the current action and its attributes
+     * are set using the raw attributes parsed by [_restAdaptor].
      *
      * @return RESTParams  the action parameters model for the current request
      */
@@ -120,7 +116,7 @@ class RESTController extends Controller
     {
         $formClassName = $this->restParamsClassName ?: ucfirst($this->id).'Params';
         $form = new $formClassName($this->getDefaultRESTParamsScenario());
-        $form->setAttributes($this->restAdaptor->getRawActionParams());
+        $form->setAttributes($this->getRawActionParams());
         return $form;
     }
 
@@ -134,5 +130,15 @@ class RESTController extends Controller
     public function getDefaultRESTParamsScenario()
     {
         return isset($this->action->id) ? $this->action->id : '';
+    }
+
+    /**
+     * Returns the raw action params data parsed by the [_restAdaptor]
+     *
+     * @return array  [_restParams] attributes
+     */
+    public function getRawActionParams()
+    {
+        return $this->restAdaptor->getRawActionParams();
     }
 }
