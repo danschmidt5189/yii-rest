@@ -155,16 +155,16 @@ class RESTAdaptor extends CComponent
         $rawData = array();
         foreach ($this->params as $param) {
             switch (strtoupper($param->source)) {
-                case RESTAdaptorSource::GET:
+                case RESTSource::GET:
                     $rawData[$param->name] = $request->getQuery($param->publicName);
                     break;
-                case RESTAdaptorSource::POST:
+                case RESTSource::POST:
                     $rawData[$param->name] = $request->getPost($param->publicName);
                     break;
-                case RESTAdaptorSource::ANY:
+                case RESTSource::ANY:
                     $rawData[$param->name] = $request->getParam($param->publicName);
                     break;
-                case RESTAdaptorSource::DELETE:
+                case RESTSource::DELETE:
                     $rawData[$param->name] = $request->getDelete($param->publicName);
                     break;
                 default:
