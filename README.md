@@ -9,18 +9,21 @@ The Yii REST extension adds classes and filters that help you write RESTful cont
 
 ## REST Controller
 
-#### A little bit Yii, a lot of bit Symfony2
+#### A few ideas borrowed from Symfony
 
 The RESTController introduces two new properties:
 
 - `$_actionParams`: A form model representing the parameters passed to your controller actions.
-- `$_facade`: A class that maps client requests to a format understood by the `$_actionParams` model.
+- `$_facade`: A class that maps client request data to `$_actionParams` attributes.
 
 There are several benefits to including these new components:
 
-- We can modify the client interface by changingt the facade layer without changing any other code.
-- We can seemlessly switch in/out parameter models having the same property interface.
-- We can validate the parameter model to easily return informative API error messages to the client.
+- We can modify either the client or internal interface and only have to change the facade layer.
+- We can seemlessly switch in/out parameter models having the same property interface. (E.g. use different
+  models based on the type of the user.)
+- We can easily return informative API messages by validating the parameter model.
+
+### Example: CustomersController.php
 
 ```php
 <?php
@@ -76,12 +79,14 @@ The facade maps the client request to the attributes of the parameter model. It 
 - Where the controller looks for those parameters. (E.g. GET, POST, ...)
 - What internal parameter the public parameter corresponds to
 
+### Example: CustomersFacade.php
+
 ```php
 <?php
 /**
- * Represents the public : private adaptor for the CustomersController
+ * Represents the public/private adaptor facade for the CustomersController
  */
-class CustomersEndpoint extends RESTEndpoint
+class CustomersFacade extends RESTFacade
 {
     public $interface = array(
         // Here the public and private keys are identical
@@ -102,6 +107,8 @@ class CustomersEndpoint extends RESTEndpoint
 RESTParams validates raw request parameters parsed by the facade layer and makes them available to your actions. Scenarios
 should correspond to an Action ID. When extending `RESTParams`, you are required to implement the `loadModel()` method,
 however it is not required that you do so. (Any CFormModel will also work.)
+
+### Example: CustomersParams.php
 
 ```php
 <?php
@@ -202,14 +209,18 @@ These are pre-configured in the RESTController as follows:
 
 ```php
 <?php
-public function filters()
-{
-    return array(
-        array('RESTVerbsFilter', 'actions' =>array('update'), 'verbs' =>array('PUT', 'PATCH')),
-        array('RESTVerbsFilter', 'actions' =>array('create'), 'verbs' =>array('POST')),
-        array('RESTVerbsFilter', 'actions' =>array('delete'), 'verbs' =>array('DELETE')),
-        array('RESTParamsFilter'),
-    );
+class RESTController extends CController {
+    ...
+    public function filters()
+    {
+        return array(
+            array('RESTVerbsFilter', 'actions' =>array('update'), 'verbs' =>array('PUT', 'PATCH')),
+            array('RESTVerbsFilter', 'actions' =>array('create'), 'verbs' =>array('POST')),
+            array('RESTVerbsFilter', 'actions' =>array('delete'), 'verbs' =>array('DELETE')),
+            array('RESTParamsFilter'),
+        );
+    }
+    ...
 }
 ?>
 ```
