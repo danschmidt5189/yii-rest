@@ -5,7 +5,7 @@
  * @author Dan Schmidt <danschmidt5189@gmail.com>
  */
 
-Yii::import('ext.yii-rest.actions.RESTAction');
+Yii::import('ext.yii-rest.components.RESTAction');
 
 /**
  * Deletes an ActiveRecord model
@@ -36,6 +36,6 @@ class RESTActionDelete extends RESTAction
 
         $this->result['deleted'] = $deleted;
         $this->result['model']   = $model;
-        parent::run();
+        echo $this->getResponse();
     }
 }

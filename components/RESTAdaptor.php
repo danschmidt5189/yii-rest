@@ -96,7 +96,7 @@ class RESTAdaptor extends CComponent
     {
         $params = array();
         foreach ($this->interface as $config) {
-            $name = $config[0];
+            $source = $config[0];
             unset($config[0]);
             $key = key($config);
             $name = current($config);

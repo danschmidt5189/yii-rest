@@ -35,6 +35,9 @@ class RESTParamsException extends CHttpException
     public function __construct(CModel $model, $statusCode=400, $message=null, $code=0, $previous=null)
     {
         $this->_model = $model;
+        if (null === $message) {
+            $message = $this->getFirstError($model);
+        }
         parent::__construct($statusCode, $message, $code, $previous);
     }
 
@@ -46,5 +49,11 @@ class RESTParamsException extends CHttpException
     public function getModel()
     {
         return $this->_model;
+    }
+
+    public function getFirstError(CModel $model)
+    {
+        $errors = $model->errors;
+        return empty($errors) ? null : current(current($errors));
     }
 }

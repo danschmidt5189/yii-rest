@@ -5,7 +5,7 @@
  * @author Dan Schmidt <danschmidt5189@gmail.com>
  */
 
-Yii::import('ext.yii-rest.actions.RESTAction');
+Yii::import('ext.yii-rest.components.RESTAction');
 
 /**
  * Saves an ActiveRecord model
@@ -47,6 +47,6 @@ class RESTActionSave extends RESTAction
         $this->result['loaded'] = $loaded;
         $this->result['saved']  = $saved;
         $this->result['model']  = $model;
-        parent::run();
+        echo $this->getResponse();
     }
 }

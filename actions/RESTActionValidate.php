@@ -5,7 +5,7 @@
  * @author Dan Schmidt <danschmidt5189@gmail.com>
  */
 
-Yii::import('ext.yii-rest.actions.RESTAction');
+Yii::import('ext.yii-rest.components.RESTAction');
 
 /**
  * Loads model attributes and validates the model
@@ -60,6 +60,6 @@ class RESTActionValidate extends RESTAction
         $this->result['loaded'] = $loaded;
         $this->result['valid']  = $valid;
         $this->result['model']  = $model;
-        parent::run();
+        echo $this->getResponse();
     }
 }

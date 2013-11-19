@@ -5,7 +5,7 @@
  * @author Dan Schmidt <danschmidt5189@gmail.com>
  */
 
-Yii::import('ext.yii-rest.actions.RESTAction');
+Yii::import('ext.yii-rest.components.RESTAction');
 
 /**
  * Loads model attributes
@@ -33,6 +33,6 @@ class RESTActionLoad extends RESTAction
 
         $this->result['loaded'] = $loaded;
         $this->result['model']  = $model;
-        parent::run();
+        echo $this->getResponse();
     }
 }

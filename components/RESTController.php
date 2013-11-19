@@ -75,7 +75,7 @@ class RESTController extends Controller
      */
     public function loadRESTAdaptor()
     {
-        $adaptorClassName = $this->restAdaptorClassName ?: $this->id.'Adaptor';
+        $adaptorClassName = $this->restAdaptorClassName ?: ucfirst($this->id).'Adaptor';
         $adaptor = new $adaptorClassName();
         return $adaptor;
     }
@@ -116,7 +116,7 @@ class RESTController extends Controller
     {
         $formClassName = $this->restParamsClassName ?: ucfirst($this->id).'Params';
         $form = new $formClassName($this->getDefaultRESTParamsScenario());
-        $form->setAttributes($this->getRawActionParams());
+        $form->setAttributes($this->getRawActionParams()->toArray());
         return $form;
     }
 

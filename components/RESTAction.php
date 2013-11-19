@@ -26,7 +26,7 @@
  * @version     0.1
  * @see         yii-rest/actions for example implementations.
  */
-class RESTAction extends CAction
+abstract class RESTAction extends CAction
 {
     /**
      * @var string  name of the view into which the result should be rendered
@@ -34,7 +34,7 @@ class RESTAction extends CAction
     public $view;
 
     /**
-     * @var array  additional view parameters. These are be merged into [_result].
+     * @var array  additional view parameters. These are merged into [_result].
      */
     public $params = array();
 
@@ -44,16 +44,6 @@ class RESTAction extends CAction
      * @see getResult()
      */
     private $_result;
-
-    /**
-     * Renders the action result into a view
-     *
-     * @return void  renders the result
-     */
-    public function run()
-    {
-        $this->controller->render($this->view ?: $this->id, $this->result->toArray());
-    }
 
     /**
      * Returns the [result] property
@@ -66,6 +56,15 @@ class RESTAction extends CAction
             $this->_result = new CMap($this->params);
         }
         return $this->_result;
+    }
+
+    /**
+     *
+     */
+    public function getResponse()
+    {
+        $this->result->mergeWith($this->controller->getActionParams());
+        return $this->controller->render($this->view ?: $this->id, $this->result->toArray(), true);
     }
 
     /**
