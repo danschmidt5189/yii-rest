@@ -2,21 +2,19 @@
 
 ## REST Controller
 
-Each REST controller handles a specific class of resources. It does not instantiate the resource directly. That function is
-delegated to the controller's parameter model. (See below.)
+Each REST controller handles a specific class of resources.
 
-The included RESTController base class handles:
+There are two key additions to REST controllers that differentiate them from normal controllers:
 
-- Filtering invalid requests by HTTP method
-- Loading the appropriate action parameter model
-- Filtering out invalid action parameters
+1. RESTEndpoint, which extracts raw action parameters from the request. This maps the controller's public interface
+   to its private interface and describes what data the controller understands from the client.
+2. RESTParams, which processes the raw action parameters. This is responsible for validating and filtering the
+   raw parameters so they can be passed to an action.
 
-When inheriting from RESTController, you must implement:
+Simply put, the RESTEndpoint takes a raw request and maps it into something that can be set as the attributes
+of the RESTParams model. The RESTParams model validates the mapped data and exposes it to the controller actions.
 
-- Your controller's parameter model, which is a FormModel used to validate and later bind your action parameters
-- getRawActionParams(), which maps request parameters to the attributes of your action params model. This maps
-  public (web) request properties to your internal model interface. If your model, the request, and your actions
-  share the same parameter names, you won't need to override this.
+Think of RESTEndpoint as an OOP version of getActionParams(), and RESTParams as an OOP version of loadModel().
 
 ```php
 <?php
@@ -26,16 +24,14 @@ When inheriting from RESTController, you must implement:
 class CustomersController extends RESTController
 {
     /**
-     * @return array  raw action parameters
+     * @var string  name of the endpoint (public interface:private interface mapper) class for this controller
      */
-    public function getRawActionParams()
-    {
-        return array(
-            'id' =>$request->getQuery('id'),
-            'type' =>$request->getQuery('type'),
-            'data' =>$request->getParam('Customer'),
-        );
-    }
+    public $endpointClassName = 'CustomersEndpoint';
+
+    /**
+     * @var string  name of the action parameter class for this controller
+     */
+    public $paramsClassName = 'CustomersParams';
 
     /**
      * Returns action configurations
@@ -96,8 +92,10 @@ class CustomersParams extends RESTParams
      */
     public $data;
 
-    // Model property is inherited from RESTParams
-    // $model
+    /**
+     * Inherited from RESTParams
+     */
+    // public $model;
 
     /**
      * @return Customer  the customer model for this request
@@ -127,6 +125,10 @@ class CustomersParams extends RESTParams
     }
 
     /**
+     * Returns validation rules
+     *
+     * Scenario names are action IDs.
+     *
      * @return array  validation rule configurations
      */
     public function rules()
@@ -144,7 +146,7 @@ class CustomersParams extends RESTParams
                 'range' =>array(Customer::ACTIVE, Customer::DISABLED),
                 'on' =>array('list'),
             ),
-            // Data is an attributes array
+            // Data is an array of attributes
             array(
                 'data',
                 'type',
@@ -152,6 +154,31 @@ class CustomersParams extends RESTParams
             ),
         ), parent::rules());
     }
+}
+?>
+```
+
+## Endpoints
+
+Endpoints map HTTP request parameters to the parameters of your controller's action parameter model. The endpoint
+provides the raw action parameters that are loaded into your controller's action parameter model.
+
+Endpoints accomplish two things:
+
+- They map external request keys to internal ones used by your parameter model. (E.g. $_POST["Customer"] to $model["data"])
+- They specify the expected source for data. (E.g. GET, POST, etc.)
+
+```php
+<?php
+class CustomersEndpoint extends RESTEndpoint
+{
+    public $interface = array(
+        array('QUERY', 'id'),
+        array('QUERY', 'type'),
+        // The 'Customer' request parameter is mapped to the 'data' attribute of
+        // the CustomersParams model.
+        array('ANY', 'Customer' =>'data'),
+    );
 }
 ?>
 ```
