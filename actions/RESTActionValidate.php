@@ -8,7 +8,9 @@
 Yii::import('ext.yii-rest.components.RESTAction');
 
 /**
- * Loads model attributes and validates the model
+ * Loads data into a model and validates it
+ *
+ * This action is capable of both standard validation and Ajax validation.
  *
  * @property array   $attributes             list of attributes that should be validated
  * @property boolean $performAjaxValidation  whether to validate using CActiveForm::validate() when the request
@@ -32,7 +34,7 @@ class RESTActionValidate extends RESTAction
     public $performAjaxValidation = true;
 
     /**
-     * Loads attributes into an AR model and validates it
+     * Loads data into a model and validates it
      *
      * Three parameters are passed to the view:
      * - boolean $loaded  whether any data was loaded into the model

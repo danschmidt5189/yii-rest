@@ -8,7 +8,10 @@
 Yii::import('ext.yii-rest.components.RESTAction');
 
 /**
- * Loads model attributes
+ * Loads data into a model and renders it to a view
+ *
+ * This action does not invoke any model methods. By not binding to the `$data` parameter,
+ * you can effectively turn this into a simple view action.
  *
  * @package     yii-rest
  * @subpackage  actions
@@ -17,7 +20,7 @@ Yii::import('ext.yii-rest.components.RESTAction');
 class RESTActionLoad extends RESTAction
 {
     /**
-     * Loads attributes into an AR model and saves it
+     * Loads data into an AR model
      *
      * Two parameters are passed to the view:
      * - boolean       $loaded  whether any data was loaded

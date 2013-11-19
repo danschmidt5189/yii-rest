@@ -10,10 +10,6 @@ Yii::import('ext.yii-rest.components.RESTAction');
 /**
  * Deletes an ActiveRecord model
  *
- * Your controller must pass an instance of CActiveRecord as the `model` parameter. This can be
- * done by overriding `getActionParams()`. Any attributes to set to the model should be passed
- * using `attributes`.
- *
  * @package     yii-rest
  * @subpackage  actions
  * @version     0.1
@@ -21,7 +17,7 @@ Yii::import('ext.yii-rest.components.RESTAction');
 class RESTActionDelete extends RESTAction
 {
     /**
-     * Deletes an AR model
+     * Deletes an ActiveRecord model
      *
      * Two parameters are passed to the view:
      * - boolean       $deleted  whether the model was deleted

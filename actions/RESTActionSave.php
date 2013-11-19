@@ -10,9 +10,8 @@ Yii::import('ext.yii-rest.components.RESTAction');
 /**
  * Saves an ActiveRecord model
  *
- * Your controller must pass an instance of CActiveRecord as the `model` parameter. This can be
- * done by overriding `getActionParams()`. Any attributes to set to the model should be passed
- * using `attributes`.
+ * Loads data into the model and saves it. By default, the model is not saved if no data is loaded into
+ * it. (To prevent wasted DB calls.)
  *
  * @property boolean $requireLoadedToSave  whether to require that data was loaded to save the model
  *
@@ -28,7 +27,7 @@ class RESTActionSave extends RESTAction
     public $requireLoadedToSave = true;
 
     /**
-     * Loads attributes into an AR model and saves it
+     * Saves an ActiveRecord model
      *
      * Three parameters are passed to the view:
      * - boolean       $loaded  whether any data was loaded into the model
