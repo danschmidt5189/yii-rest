@@ -1,38 +1,32 @@
 # Yii REST
 
+The Yii REST extension adds classes and filters that help you write RESTful controllers. Key features:
+
+1. A facade layer for translating client requests to a format your controller understands
+2. A parameter model for validating and configuring your action parameters in an OOP way
+3. A standard set of Actions for all your CRUD needs
+4. A works-out-of-the-box RESTController with verb and parameter filtering
+
 ## REST Controller
 
-Each REST controller handles a specific class of resources.
+A RESTController manages a class of resources in an OOP fashion. It introduces two new properties:
 
-There are two key additions to REST controllers that differentiate them from normal controllers:
-
-1. RESTEndpoint, which extracts raw action parameters from the request. This maps the controller's public interface
-   to its private interface and describes what data the controller understands from the client.
-2. RESTParams, which processes the raw action parameters. This is responsible for validating and filtering the
-   raw parameters so they can be passed to an action.
-
-Simply put, the RESTEndpoint takes a raw request and maps it into something that can be set as the attributes
-of the RESTParams model. The RESTParams model validates the mapped data and exposes it to the controller actions.
-
-Think of RESTEndpoint as an OOP version of getActionParams(), and RESTParams as an OOP version of loadModel().
+- `$_facade`: A mapper that translates client requests into a standard internal format. This is analogous
+  to `CController::getActionParams()`.
+- `$_actionParams`: A form model representing the action parameters. This can be validated by your filters,
+  and it is also used to directly bind your controller action parameters.
 
 ```php
 <?php
 /**
  * Example: A RESTful customers controller.
+ *
+ * The default implementation will load a facade component called `CustomersFacade` and a parameter
+ * model called `CustomersParams`. The rest is done for you. The parent implementation adds standard
+ * REST verb filters and validates the action parametermodel.
  */
 class CustomersController extends RESTController
 {
-    /**
-     * @var string  name of the endpoint (public interface:private interface mapper) class for this controller
-     */
-    public $endpointClassName = 'CustomersEndpoint';
-
-    /**
-     * @var string  name of the action parameter class for this controller
-     */
-    public $paramsClassName = 'CustomersParams';
-
     /**
      * Returns action configurations
      *
@@ -63,17 +57,44 @@ class CustomersController extends RESTController
 ?>
 ```
 
-## Action Parameters
+## REST Facade: Fancy `getActionParams()`
 
-The parameter model replaces Yii's standard loadModel() method, encapsulating that logic into a form class that
-is used to validate request parameters as well as bind parameters to your controller actions.
+The facade extracts raw action parameters from the client request. It is analogous to `CController::getActionParams()`.
 
-A parameter model can be any CFormModel, but to work with the included RESTAction classes you should inherit
-from RESTParams, which includes some helpful methods and validation rules for loading and handling the model.
-When inheriting from this class, you must implement the loadModel() method to load the model property.
+The facade layer manages two things:
+
+- Where to look for data in the client request. (E.g. GET, POST, ...)
+- How to map a client key to an internal parameter attribute (E.g. $_GET["Customer"] =>$params->filters)
 
 ```php
 <?php
+class CustomersEndpoint extends RESTEndpoint
+{
+    public $interface = array(
+        array('QUERY', 'id'),
+        array('QUERY', 'type'),
+        // The 'Customer' request parameter is mapped to the 'data' attribute of
+        // the CustomersParams model.
+        array('ANY', 'Customer' =>'data'),
+    );
+}
+?>
+```
+
+## RESTParams: Fancy `loadModel()`
+
+RESTParams is a model representing the parameters passed as arguments to your controller actions. A standard way to use
+this would be to expose a `$model` property which is constructed with some initial, unchangeable settings (e.g. scopes)
+along with modifications due to the current request. (E.g., "If 'id' is set, load that specific customer after applying all
+scopes and filters.")
+
+The scenario of a RESTParams model should correspond to an Action ID.
+
+```php
+<?php
+/**
+ * Represents action parameters for the CustomersController.
+ */
 class CustomersParams extends RESTParams
 {
     /**
@@ -154,31 +175,6 @@ class CustomersParams extends RESTParams
             ),
         ), parent::rules());
     }
-}
-?>
-```
-
-## Endpoints
-
-Endpoints map HTTP request parameters to the parameters of your controller's action parameter model. The endpoint
-provides the raw action parameters that are loaded into your controller's action parameter model.
-
-Endpoints accomplish two things:
-
-- They map external request keys to internal ones used by your parameter model. (E.g. $_POST["Customer"] to $model["data"])
-- They specify the expected source for data. (E.g. GET, POST, etc.)
-
-```php
-<?php
-class CustomersEndpoint extends RESTEndpoint
-{
-    public $interface = array(
-        array('QUERY', 'id'),
-        array('QUERY', 'type'),
-        // The 'Customer' request parameter is mapped to the 'data' attribute of
-        // the CustomersParams model.
-        array('ANY', 'Customer' =>'data'),
-    );
 }
 ?>
 ```
