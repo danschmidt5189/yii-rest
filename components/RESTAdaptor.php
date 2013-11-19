@@ -1,6 +1,6 @@
 <?php
 /**
- * RESTFacade class file.
+ * RESTAdaptor class file.
  *
  * @author Dan Schmidt <danschmidt5189@gmail.com>
  */
@@ -16,12 +16,12 @@ Yii::import('ext.yii-rest.*');
  * @package     yii-rest
  * @subpackage  components
  */
-class RESTFacade extends CComponent
+class RESTAdaptor extends CComponent
 {
     /**
-     * @var array  list of RESTFacadeParam configurations. Each configuration is an array with keys:
+     * @var array  list of RESTAdaptorParam configurations. Each configuration is an array with keys:
      * 0 = private attribute name, required
-     * 1 = attribute source (@see RESTFacadeSource for values), optional
+     * 1 = attribute source (@see RESTAdaptorSource for values), optional
      * 2 = public attribute name, optional
      */
     public $interface = array();
@@ -41,7 +41,7 @@ class RESTFacade extends CComponent
      *
      * If they have not been loaded, they are instantiated using [loadParams()].
      *
-     * @return array  list of RESTFacadeParam objects
+     * @return array  list of RESTAdaptorParam objects
      */
     public function getParams($reset=false)
     {
@@ -54,7 +54,7 @@ class RESTFacade extends CComponent
     /**
      * Returns endpoint parameters indexed by private name
      *
-     * @return array  list of RESTFacadeParam objects built from [interface]
+     * @return array  list of RESTAdaptorParam objects built from [interface]
      */
     public function loadParams()
     {
@@ -65,7 +65,7 @@ class RESTFacade extends CComponent
             $key = key($config);
             $name = current($config);
             $publicName = is_numeric($key) ? $name : $key;
-            $params[$name] = new RESTFacadeParam($source, $name, $publicName);
+            $params[$name] = new RESTAdaptorParam($source, $name, $publicName);
         }
         return $params;
     }
@@ -97,16 +97,16 @@ class RESTFacade extends CComponent
         $rawData = array();
         foreach ($this->params as $param) {
             switch (strtoupper($param->source)) {
-                case RESTFacadeSource::GET:
+                case RESTAdaptorSource::GET:
                     $rawData[$param->name] = $request->getQuery($param->publicName);
                     break;
-                case RESTFacadeSource::POST:
+                case RESTAdaptorSource::POST:
                     $rawData[$param->name] = $request->getPost($param->publicName);
                     break;
-                case RESTFacadeSource::ANY:
+                case RESTAdaptorSource::ANY:
                     $rawData[$param->name] = $request->getParam($param->publicName);
                     break;
-                case RESTFacadeSource::DELETE:
+                case RESTAdaptorSource::DELETE:
                     $rawData[$param->name] = $request->getDelete($param->publicName);
                     break;
                 default:

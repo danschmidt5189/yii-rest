@@ -1,6 +1,6 @@
 <?php
 /**
- * RESTFacadeParam class file.
+ * RESTAdaptorParam class file.
  *
  * @author Dan Schmidt <danschmidt5189@gmail.com>
  */
@@ -13,7 +13,7 @@ Yii::import('ext.yii-rest.*');
  * @package     yii-rest
  * @subpackage  components
  */
-class RESTFacadeParam extends CComponent
+class RESTAdaptorParam extends CComponent
 {
     /**
      * @var string  internal name for the parameter

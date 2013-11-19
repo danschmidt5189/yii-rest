@@ -2,10 +2,10 @@
 
 The Yii REST extension adds classes and filters that help you write RESTful controllers. Key features:
 
-1. A Adaptor layer for translating client requests to a format your controller understands
-2. A parameter model for validating and configuring your action parameters in an OOP way
-3. A standard set of Actions for all your CRUD needs
-4. A works-out-of-the-box RESTController with verb and parameter filtering
+1. An adaptor layer for translating client requests to parameters understood by your controller's actions
+2. A parameter model for configuring and validating your action parameters in an OOP way
+3. A standard set of actions for all your CRUD needs
+4. A pre-configured RESTController with verb and parameter filtering
 
 ## RESTController
 
