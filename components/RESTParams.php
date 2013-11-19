@@ -34,6 +34,11 @@ abstract class RESTParams extends CFormModel
     public $model;
 
     /**
+     * @var array  model attributes
+     */
+    public $data;
+
+    /**
      * Returns the model given the current form settings
      *
      * @return CModel  the configured model
@@ -53,6 +58,11 @@ abstract class RESTParams extends CFormModel
     public function rules()
     {
         return array(
+            array(
+                'data',
+                'type',
+                'type' =>'array',
+            ),
             array('model', 'filter', 'filter' =>array($this, 'loadModel')),
             array('model', 'required'),
             array('model', 'unsafe'),
