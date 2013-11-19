@@ -21,6 +21,16 @@ which the controller can translate (through delegation) to a response that conve
 allowed by the user. (E.g. JSON, HTML, XML, ...) However this is not currently implemented, as it is a feature
 much more easily handled using the upcoming Yii2.
 
+## Installation
+
+Copy or clone the folder into your extensions directory and add the following alias to your application:
+
+```php
+<?php
+Yii::setPathOfAlias('yii-rest', dirname(__FILE__).'/../extensions/yii-rest');
+?>
+```
+
 ## RESTController
 
 The RESTController introduces two new properties:

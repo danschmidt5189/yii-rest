@@ -12,14 +12,20 @@ Yii::import('ext.yii-rest.*');
  *
  * The main purpose of this class is to override the behavior of `getActionParams()` to use a form model
  * rather than raw parameter data. The form model can be accessed like an array (i.e. implements ArrayAccess),
- * but can also be validated using a filter.
+ * but has the added benefit that you can validate it.
  *
- * @property RESTParams $actionParams  the form model containing action parameters
+ * @property string      $restAdaptorClassName  name of the adaptor class to use. Defaults to "{ControllerID}Adaptor".
+ * @property string      $restParamsClassName   name of the params class to use. Defaults to "{ControllerID}Params".
  *
- * @method RESTParams getActionParams()          returns the action parameter model
- * @method RESTParams loadRESTParams()         loads the default form model
- * @method string     getRESTParamsScenario()  returns the validation scenario for the action parameters
- * @method array      getRawActionParams()       returns the raw action parameters
+ * @property RESTParams  $_restParams   the form model containing action parameters
+ * @property RESTAdaptor $_restAdaptor  the adaptor that maps client request data to $_restParams attributes
+ *
+ * @method RESTParams getRESTAdaptor()                returns the controller adaptor
+ * @method RESTParams loadRESTAdaptor()               loads the controller adaptor
+ * @method RESTParams getActionParams()               overrides the default implementation to return the [_restParams] model
+ * @method RESTParams getRESTParams()                 returns the action parameter *model* instead of raw data array
+ * @method RESTParams loadRESTParams()                loads the form model
+ * @method string     getDefaultRESTParamsScenario()  returns the validation scenario for [_restParams]
  *
  * @package     yii-rest
  * @subpackage  components
@@ -34,7 +40,7 @@ class RESTController extends Controller
     /**
      * @var string  name of the params class. If empty, '{ControllerId}Params' is used.
      */
-    public $restParamsClass;
+    public $restParamsClassName;
 
     /**
      * @var RESTAdaptor  the facade model for this controller. This maps client requests to the attribute
@@ -112,8 +118,8 @@ class RESTController extends Controller
      */
     public function loadRESTParams()
     {
-        $formClassName = ucfirst($this->id).'Params';
-        $form = new $formClassName($this->getRESTParamsScenario());
+        $formClassName = $this->restParamsClassName ?: ucfirst($this->id).'Params';
+        $form = new $formClassName($this->getDefaultRESTParamsScenario());
         $form->setAttributes($this->restAdaptor->getRawActionParams());
         return $form;
     }
@@ -123,9 +129,9 @@ class RESTController extends Controller
      *
      * Defaults to the current action id if it is set, otherwise empty.
      *
-     * @return string  scenario name
+     * @return string  scenario in which [_restParams] will be instantiated
      */
-    public function getRESTParamsScenario()
+    public function getDefaultRESTParamsScenario()
     {
         return isset($this->action->id) ? $this->action->id : '';
     }
