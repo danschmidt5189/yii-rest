@@ -31,6 +31,10 @@ Yii::setPathOfAlias('yii-rest', dirname(__FILE__).'/../extensions/yii-rest');
 ?>
 ```
 
+The file `yii-rest/components/RESTController.php` inherits from a custom base controller assumed to live at
+`application.components.Controller`. You must modify this if your base controller is located elsewhere, named differently,
+or if you do not use a custom base controller.
+
 ## RESTController
 
 The RESTController introduces two new properties:
