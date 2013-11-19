@@ -7,7 +7,7 @@ The Yii REST extension adds classes and filters that help you write RESTful cont
 3. A standard set of Actions for all your CRUD needs
 4. A works-out-of-the-box RESTController with verb and parameter filtering
 
-## REST Controller
+## RESTController
 
 #### A few ideas borrowed from Symfony
 
@@ -69,7 +69,7 @@ class CustomersController extends RESTController
 ?>
 ```
 
-## REST Facade
+## RESTFacade
 
 #### A fancy version of `getActionParams()`
 
@@ -90,11 +90,11 @@ class CustomersFacade extends RESTFacade
 {
     public $interface = array(
         // Here the public and private keys are identical
-        array('QUERY', 'id'),
-        array('QUERY', 'type'),
+        array(RESTFacadeSource::GET, 'id'),
+        array(RESTFacadeSource::GET, 'type'),
         // Here the client provides the 'Customer' parameter, which is mapped
         // to the 'data' property of the params model
-        array('ANY', 'Customer' =>'data'),
+        array(RESTFacadeSource::ANY, 'Customer' =>'data'),
     );
 }
 ?>
@@ -104,9 +104,12 @@ class CustomersFacade extends RESTFacade
 
 #### A fancy version of `loadModel()`
 
-RESTParams validates raw request parameters parsed by the facade layer and makes them available to your actions. Scenarios
-should correspond to an Action ID. When extending `RESTParams`, you are required to implement the `loadModel()` method,
-however it is not required that you do so. (Any CFormModel will also work.)
+RESTParams validates raw request parameters extracted by the facade layer and makes them available to your actions.
+
+`RESTParams::$scenario` should correspond to an action ID.
+
+If implementing RESTParams, you must implement the `loadModel()` method. However, you do not have to implement RESTParams;
+any CFormModel will also work, with its public properties used to bind action parameter values.
 
 ### Example: CustomersParams.php
 
@@ -192,7 +195,10 @@ class CustomersParams extends RESTParams
                 'type',
                 'type' =>'array',
             ),
-        ), parent::rules());
+        ),
+        // Merge parent rules so that the model is loaded, required,
+        // and declared unsafe.
+        parent::rules());
     }
 }
 ?>
@@ -204,6 +210,8 @@ Two filters are bundled with this extension:
 
 - RESTVerbsFilter, for filtering out invalid requests based on the HTTP method
 - RESTParamsFilter, which filters out invalid requests using a form to validate action parameters
+
+(There is an empty base `yii-rest.components.RESTFilter` that you can override as you see fit.)
 
 These are pre-configured in the RESTController as follows:
 
