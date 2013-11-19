@@ -18,7 +18,7 @@ Yii::import('ext.yii-rest.*');
  *
  * @method RESTParams getActionParams()          returns the action parameter model
  * @method RESTParams loadRESTParams()         loads the default form model
- * @method string     getActionParamsScenario()  returns the validation scenario for the action parameters
+ * @method string     getRESTParamsScenario()  returns the validation scenario for the action parameters
  * @method array      getRawActionParams()       returns the raw action parameters
  *
  * @package     yii-rest
@@ -38,14 +38,14 @@ class RESTController extends Controller
 
     /**
      * @var RESTAdaptor  the facade model for this controller. This maps client requests to the attribute
-     *                   format expected by the [_actionParams] model.
+     *                   format expected by the [_restParams] model.
      */
     private $_restAdaptor;
 
     /**
      * @var RESTParams  the form model representing action parameters
      */
-    private $_actionParams;
+    private $_restParams;
 
     /**
      * Returns the [_restAdaptor] property
@@ -79,16 +79,26 @@ class RESTController extends Controller
     }
 
     /**
-     * Returns the [_actionParams] property
+     * Overrides the parent implementation to return the loaded [_restParams] property
      *
-     * @return RESTParams  action parameters
+     * @return CFormModel  loaded [_restParams] value
      */
     public function getActionParams()
     {
-        if (null === $this->_actionParams) {
-            $this->_actionParams = $this->loadRESTParams();
+        return $this->getRESTParams();
+    }
+
+    /**
+     * Returns the [_restParams] property
+     *
+     * @return RESTParams  action parameters
+     */
+    public function getRESTParams()
+    {
+        if (null === $this->_restParams) {
+            $this->_restParams = $this->loadRESTParams();
         }
-        return $this->_actionParams;
+        return $this->_restParams;
     }
 
     /**
@@ -103,7 +113,7 @@ class RESTController extends Controller
     public function loadRESTParams()
     {
         $formClassName = ucfirst($this->id).'Params';
-        $form = new $formClassName($this->getActionParamsScenario());
+        $form = new $formClassName($this->getRESTParamsScenario());
         $form->setAttributes($this->restAdaptor->getRawActionParams());
         return $form;
     }
@@ -115,7 +125,7 @@ class RESTController extends Controller
      *
      * @return string  scenario name
      */
-    public function getActionParamsScenario()
+    public function getRESTParamsScenario()
     {
         return isset($this->action->id) ? $this->action->id : '';
     }

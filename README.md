@@ -9,19 +9,21 @@ The Yii REST extension adds classes and filters that help you write RESTful cont
 
 ## RESTController
 
-#### A few ideas borrowed from Symfony
-
 The RESTController introduces two new properties:
 
-- `$_restParams`: A form model representing the parameters passed to your controller actions.
-- `$_restAdaptor`: A class that maps client request data to `$_restParams` attributes.
+- `$_restParams`: A form model representing the parameters passed to your controller actions. This is analogous
+  to the `loadModel()` method in the standard Gii crud controllers, but in an OOP fashion.
+- `$_restAdaptor`: A class that maps client request data to `$_restParams` attributes. This is analogous to
+  `CController::getActionParams()` in that it returns the raw request data bound to your action parameters.
 
 There are several benefits to including these new components:
 
 - To change how client requests are mapped to the back-end, we need only change the adaptor layer
 - We can seemlessly swap between parameter models having the same property interface. (E.g. one model
-  for Admins and another for standard users.)
-- We can easily return informative API messages by validating the parameter model
+  for admins and another for standard users.)
+- We can easily return informative API error messages by validating the parameter model
+- We keep our controllers (and actions) super thin by delegating complex loading/initialization logic
+  to dedicated classes.
 
 ### Example: CustomersController.php
 
@@ -72,8 +74,6 @@ class CustomersController extends RESTController
 
 ## RESTAdaptor
 
-#### A fancy version of `getActionParams()`
-
 The adaptor maps the client request to the attributes of the params model.
 
 Its configuration indicates three things:
@@ -81,6 +81,9 @@ Its configuration indicates three things:
 - What public params the controller looks for
 - What internal param the public param maps to
 - Where the controller looks for the public param. (E.g. GET, POST, ...)
+
+`RESTAdaptor::getRawActionParams()` parses the current request and returns the client parameters mapped
+to the attributes you specify in `RESTAdaptor::$interface`.
 
 ### Example: CustomersAdaptor.php
 
