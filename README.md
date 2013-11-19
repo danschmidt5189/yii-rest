@@ -1,11 +1,25 @@
 # Yii REST
 
-The Yii REST extension adds classes and filters that help you write RESTful controllers. Key features:
+The Yii REST extension adds classes and filters that help you write RESTful controllers.
 
-1. An adaptor layer for translating client requests to parameters understood by your controller's actions
-2. A parameter model for configuring and validating your action parameters in an OOP way
-3. A standard set of actions for all your CRUD needs
-4. A pre-configured RESTController with verb and parameter filtering
+Key components:
+
+- RESTAdaptor: An adaptor layer translating raw client request data to a format understood by your
+  controller actions. An OOP version of `CController::getActionParams()`.
+- RESTParams: A form model responsible for validating and loaded your action parameters based on the
+  raw data parsed by the adaptor. An OOP version of `loadModel()`.
+- RESTController: A base controller that ties together the two components above along with sensible
+  default filters, e.g. verbs and validation filtering.
+- RESTAction(s): A set of lightweight actions that handle all of your CRUD needs.
+
+The ultimate goal is to create controllers and actions that are extremely thin, with swappable components
+for both their public interface and parameter generation, and that can be described programatically for later
+documentation via the HTTP OPTIONS method.
+
+In addition, the controllers should be format-agnostic. Actions should only expose raw data via `RESTAction::getResult()`,
+which the controller can translate (through delegation) to a response that converts the raw data into a type
+allowed by the user. (E.g. JSON, HTML, XML, ...) However this is not currently implemented, as it is a feature
+much more easily handled using the upcoming Yii2.
 
 ## RESTController
 
