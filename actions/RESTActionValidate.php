@@ -34,6 +34,12 @@ class RESTActionValidate extends RESTAction
     public $performAjaxValidation = true;
 
     /**
+     * @var boolean  whether to require that data be loaded into the model in order to validate. Defaults to true.
+     *               Setting this to true prevents seeing validation errors when first viewing a form page.
+     */
+    public $requireLoadedToValidate = true;
+
+    /**
      * Loads data into a model and validates it
      *
      * Three parameters are passed to the view:
@@ -57,7 +63,7 @@ class RESTActionValidate extends RESTAction
             echo CActiveForm::validate($model, $this->attributes, false);
             Yii::app()->end();
         }
-        $valid = $model->validate($this->attributes);
+        $valid = ($loaded || !$this->requireLoadedToValidate) ? $model->validate($this->attributes) : null;
 
         $this->result['loaded'] = $loaded;
         $this->result['valid']  = $valid;
