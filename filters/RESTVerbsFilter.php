@@ -32,9 +32,9 @@ class RESTVerbsFilter extends RESTFilter
     public $message;
 
     /**
-     * @var integer  exception status code
+     * @var integer  exception status code. Defaults to 405 ("Method Not Allowed").
      */
-    public $statusCode = 400;
+    public $statusCode = 405;
 
     /**
      * @var integer  exception code
