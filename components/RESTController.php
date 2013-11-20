@@ -84,7 +84,7 @@ class RESTController extends Controller
      */
     public function loadRESTAdaptor()
     {
-        $adaptorClassName = $this->restAdaptorClassName ?: ucfirst($this->id).'Adaptor';
+        $adaptorClassName = $this->restAdaptorClassName ?: $this->guessClassPrefix().'Adaptor';
         $adaptor = new $adaptorClassName();
         return $adaptor;
     }
@@ -123,7 +123,7 @@ class RESTController extends Controller
      */
     public function loadRESTParams()
     {
-        $formClassName = $this->restParamsClassName ?: ucfirst($this->id).'Params';
+        $formClassName = $this->restParamsClassName ?: $this->guessClassPrefix().'Params';
         $form = new $formClassName($this->getDefaultRESTParamsScenario());
         $form->setAttributes($this->getRawActionParams()->toArray());
         return $form;
@@ -152,7 +152,9 @@ class RESTController extends Controller
     }
 
     /**
+     * Returns the unique id for the current action
      *
+     * @return string  unique identifier for the current module/controller/action
      */
     public function getUniqueActionId()
     {
@@ -179,8 +181,9 @@ class RESTController extends Controller
             'list'    =>array('class' =>'yii-rest.actions.RESTActionLoad'),
             'new'     =>array('class' =>'yii-rest.actions.RESTActionValidate'),
             'edit'    =>array('class' =>'yii-rest.actions.RESTActionValidate'),
-            'update'  =>array('class' =>'yii-rest.actions.RESTActionSave'),
-            'create'  =>array('class' =>'yii-rest.actions.RESTActionSave'),
+            'update'  =>array('class' =>'yii-rest.actions.RESTActionSave', 'view' =>'//shared/save'),
+            'create'  =>array('class' =>'yii-rest.actions.RESTActionSave', 'view' =>'//shared/save'),
+            // 'delete'  =>array('class' =>'yii-rest.actions.RESTActionDelete', 'view' =>'//shared/delete'),
         );
     }
 
@@ -196,12 +199,18 @@ class RESTController extends Controller
      */
     public function filters()
     {
-        return array(
+        return CMap::mergeArray(array(
             array('RESTVerbsFilter', 'actions' =>array('create'), 'verbs' =>array('POST')),
-            array('RESTVerbsFilter', 'actions' =>array('update'), 'verbs' =>array('PUT', 'PATCH')),
-            array('RESTVerbsFilter', 'actions' =>array('delete'), 'verbs' =>array('DELETE')),
+            array('RESTVerbsFilter', 'actions' =>array('update'), 'verbs' =>array('POST', 'PATCH', 'PUT')),
+            array('RESTVerbsFilter', 'actions' =>array('delete'), 'verbs' =>array('POST', 'DELETE')),
             array('RESTParamsFilter'),
             'accessControl',
-        );
+        ), parent::filters());
+    }
+
+    protected function guessClassPrefix()
+    {
+        $className = get_class($this);
+        return ucfirst(substr($className, 0, strlen($className) - 10));
     }
 }
