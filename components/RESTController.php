@@ -37,6 +37,11 @@ Yii::import('application.components.Controller');
 class RESTController extends Controller
 {
     /**
+     * @var string  the default action
+     */
+    public $defaultAction = 'list';
+
+    /**
      * @var string  name of the adaptor class. If empty, '{ControllerId}Adaptor' is used.
      */
     public $restAdaptorClassName;
@@ -144,6 +149,17 @@ class RESTController extends Controller
     public function getRawActionParams()
     {
         return $this->restAdaptor->getRawActionParams();
+    }
+
+    /**
+     *
+     */
+    public function getUniqueActionId()
+    {
+        return md5(implode('.', array(
+            $this->getUniqueId(),
+            isset($this->action->id) ? $this->action->id : null,
+        )));
     }
 
     /**
