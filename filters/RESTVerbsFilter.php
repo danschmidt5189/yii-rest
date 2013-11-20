@@ -22,7 +22,7 @@ class RESTVerbsFilter extends RESTFilter
     public $actions;
 
     /**
-     * @var array  list of HTTP methods that are allowed
+     * @var array  list of HTTP methods that are allowed. Defaults to only allow 'POST' requests.
      */
     public $verbs = array('POST');
 
@@ -80,7 +80,7 @@ class RESTVerbsFilter extends RESTFilter
     public function isVerbMatched($verb)
     {
         $verbs = is_array($this->verbs) ? $this->verbs : array_map('trim', explode(',', $this->verbs));
-        return false !== array_search($verb, $verbs);
+        return false !== array_search(strtoupper($verb), $verbs);
     }
 
     /**
@@ -91,7 +91,10 @@ class RESTVerbsFilter extends RESTFilter
      */
     public function badRequest($verb)
     {
-        $message = str_replace('{verb}', $verb, $this->message ?: Yii::t('app', 'Your request is invalid'));
+        $message = str_replace('{verb}', $verb, $this->message ?: Yii::t('yii-rest', 'HTTP method {verb} is invalid. Use: {allowed}', array(
+            '{verb}' =>$verb,
+            '{allowed}' =>implode(', ', $this->verbs),
+        )));
         throw new CHttpException($this->statusCode ?: 400, $message, $this->code);
     }
 }
