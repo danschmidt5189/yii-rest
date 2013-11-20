@@ -1,6 +1,16 @@
 # Yii REST
 
-The Yii REST extension adds classes and filters that help you write RESTful controllers.
+The Yii REST extension adds classes and filters that help you write RESTful controllers. Each RESTController has three components:
+
+1. An Adaptor. This maps client data to your action parameters, e.g. `$_GET['Customer'] =>"data"`.
+2. A Params model. This validates action parameters and loads your underlying ActiveRecord (or other) models.
+3. The controller. This ties the above two together along with actions and filters.
+
+The result is a controller that can describe its interface (via the Adaptor) and easily respond with detailed error messages (via
+the params model). The controller and its actions are extremely thin and each component can be swapped out given a different user/
+request scenario.
+
+## Overview
 
 Key components:
 
@@ -35,7 +45,9 @@ The file `yii-rest/components/RESTController.php` inherits from a custom base co
 `application.components.Controller`. You must modify this if your base controller is located elsewhere, named differently,
 or if you do not use a custom base controller.
 
-## RESTController
+## Components
+
+### RESTController
 
 The RESTController introduces two new properties:
 
@@ -52,7 +64,7 @@ There are several benefits to including these new components:
 - To change the action parameters, change the params model. (E.g. swap out "Admin" and "User" models depending
   on the current user.)
 
-### Example: CustomersController.php
+#### Example: CustomersController.php
 
 ```php
 <?php
@@ -83,7 +95,7 @@ class CustomersController extends RESTController
 ?>
 ```
 
-## RESTAdaptor
+### RESTAdaptor
 
 The RESTAdaptor maps client request data to the attributes of your RESTParams model.
 
@@ -100,7 +112,7 @@ The RESTAdaptor allows you to configure:
 The RESTController uses the RESTAdaptor to parse the raw request for model attributes
 and to populate the RESTParams model with those attributes.
 
-### Example: CustomersAdaptor.php
+#### Example: CustomersAdaptor.php
 
 ```php
 <?php
@@ -125,7 +137,7 @@ class CustomersAdaptor extends RESTAdaptor
 ?>
 ```
 
-## RESTParams
+### RESTParams
 
 RESTParams validates and processes raw request parameters extracted by the adaptor and makes them available to your actions.
 `RESTParams::$scenario` should correspond to an action ID.
@@ -137,7 +149,7 @@ If implementing RESTParams, you must implement the `loadModel()` method. However
 any CFormModel will also work, with its public properties used to bind action parameters. But if you find yourself adding a 'model'
 or 'data' property to your form model, RESTParams is probably an easier choice.
 
-### Example: CustomersParams.php
+#### Example: CustomersParams.php
 
 ```php
 <?php
@@ -240,7 +252,7 @@ class CustomersParams extends RESTParams
 ?>
 ```
 
-## RESTActions
+### RESTActions
 
 This extension ships with four basic CRUD actions:
 
@@ -255,7 +267,7 @@ This extension ships with four basic CRUD actions:
 Each action can be configured with its own `$view` and `$params`, which determines
 the view into with the action's result and parameters are rendered.
 
-## Filters
+### Filters
 
 Two filters are bundled with this extension:
 
