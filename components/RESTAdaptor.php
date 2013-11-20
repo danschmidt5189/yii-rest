@@ -101,7 +101,7 @@ class RESTAdaptor extends CComponent
             $key = key($config);
             $name = current($config);
             $publicName = is_numeric($key) ? $name : $key;
-            $params[$name] = new RESTAdaptorParam($source, $name, $publicName);
+            $params[] = new RESTAdaptorParam($source, $name, $publicName);
         }
         return $params;
     }
@@ -149,7 +149,7 @@ class RESTAdaptor extends CComponent
                     throw new CException("Invalid source `$source` for internal param {$param->name}, client param {$param->publicName} in ".__CLASS__);
             }
             // Prevent overriding previously set data with nulls
-            if (null !== $value || !isset($rawData[$param->name])) {
+            if (!empty($value) || !isset($rawData[$param->name])) {
                 $rawData[$param->name] = $value;
             }
         }
