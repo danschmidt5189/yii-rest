@@ -134,19 +134,23 @@ class RESTAdaptor extends CComponent
         foreach ($this->params as $param) {
             switch (strtoupper($param->source)) {
                 case RESTSource::GET:
-                    $rawData[$param->name] = $request->getQuery($param->publicName);
+                    $value = $request->getQuery($param->publicName);
                     break;
                 case RESTSource::POST:
-                    $rawData[$param->name] = $request->getPost($param->publicName);
+                    $value = $request->getPost($param->publicName);
                     break;
                 case RESTSource::ANY:
-                    $rawData[$param->name] = $request->getParam($param->publicName);
+                    $value = $request->getParam($param->publicName);
                     break;
                 case RESTSource::DELETE:
-                    $rawData[$param->name] = $request->getDelete($param->publicName);
+                    $value = $request->getDelete($param->publicName);
                     break;
                 default:
                     throw new CException("Invalid source `$source` for internal param {$param->name}, client param {$param->publicName} in ".__CLASS__);
+            }
+            // Prevent overriding previously set data with nulls
+            if (null !== $value || !isset($rawData[$param->name])) {
+                $rawData[$param->name] = $value;
             }
         }
         return $rawData;
