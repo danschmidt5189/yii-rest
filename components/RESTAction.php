@@ -78,6 +78,6 @@ abstract class RESTAction extends CAction
     {
         $oldAttributes = $model->getAttributes();
         $model->setAttributes($data);
-        return $oldAttributes === $model->getAttributes();
+        return $oldAttributes !== $model->getAttributes();
     }
 }
