@@ -81,7 +81,7 @@ class RESTParamsFilter extends RESTFilter
         if ($this->isActionMatched($action)) {
             $form = $this->loadForm($controller, $action);
             if (!$form->validate()) {
-                $this->badRequest($form);
+                return $this->badRequest($form);
             }
         }
         return true;
@@ -116,7 +116,7 @@ class RESTParamsFilter extends RESTFilter
     public function badRequest($form)
     {
         if ($this->errorCallback && call_user_func_array($this->errorCallback, array($form))) {
-            return;
+            return true;
         }
         throw new RESTParamsException($form, $this->statusCode, $this->message, $this->code);
     }
