@@ -64,7 +64,7 @@ abstract class RESTParams extends CFormModel
                 'type' =>'array',
             ),
             array('model', 'filter', 'filter' =>array($this, 'loadModel')),
-            array('model', 'required'),
+            array('model', 'required', 'message' =>Yii::t('yii-rest', 'Record not found.')),
             array('model', 'unsafe'),
         );
     }
