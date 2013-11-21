@@ -98,10 +98,10 @@ class RESTAdaptor extends CComponent
         foreach ($this->interface as $config) {
             $source = $config[0];
             unset($config[0]);
-            $key = key($config);
-            $name = current($config);
+            $key        = key($config);
+            $name       = current($config);
             $publicName = is_numeric($key) ? $name : $key;
-            $params[] = new RESTAdaptorParam($source, $name, $publicName);
+            $params[]   = new RESTAdaptorParam($source, $name, $publicName);
         }
         return $params;
     }
