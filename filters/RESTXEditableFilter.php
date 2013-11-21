@@ -53,9 +53,10 @@ class RESTXEditableFilter extends RESTFilter
     public $prefix;
 
     /**
-     * @var string  route to which X-Editable requests are forwarded after filter
+     * @var string  route to which X-Editable requests are forwarded after filter. Leave empty to not forward
+     *              the request.
      */
-    public $forward = 'update';
+    public $forward;
 
     /**
      * @var boolean  whether to end the application after forwarding
@@ -82,7 +83,9 @@ class RESTXEditableFilter extends RESTFilter
             $_GET[$this->id]                      = $_POST['pk'];
             $_POST[$this->prefix][$_POST['name']] = $_POST['value'];
             unset($_POST['pk'], $_POST['name'], $_POST['value']);
-            $controller->forward($this->forward, $this->exit);
+            if ($this->forward) {
+                $controller->forward($this->forward, $this->exit);
+            }
         }
         return true;
     }
